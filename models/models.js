@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const got = require('got');
 
 const details = async (videoId) => {
   const link = `https://www.googleapis.com/youtube/v3/videos?part=id%2C+snippet&id=${videoId}&key=${process.env.API_KEY}`;
@@ -16,6 +17,19 @@ const details = async (videoId) => {
     .catch((e) => console.error(e.message));
 };
 
-const streamer = () => console.log('hello streamer');
+const streamer = async (id) => {
+  const url = 'https://api.twitch.tv/kraken/users?id=' + id;
+  const headers = {
+    'Client-ID': 'ab1kjt32dzahtg58lc8ask7t7kj3j2',
+    Accept: 'application / vnd.twitchtv.v5 + json',
+  };
 
+  const options = {
+    url,
+    headers,
+  };
+  return await got(options)
+    .then((res) => JSON.parse(res.body))
+    .then((data) => data.users[0].display_name);
+};
 module.exports = { details, streamer };

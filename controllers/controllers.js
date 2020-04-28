@@ -13,7 +13,7 @@ const getDetails = async (req, res) => {
 
 const getStreamer = async (req, res) => {
   try {
-    const streamer = await models.streamer(req.body.name);
+    const streamer = await models.streamer(req.body.id);
     res.status(200);
     res.send(streamer);
   } catch (e) {
