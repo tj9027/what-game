@@ -1,13 +1,10 @@
-const fetch = require('node-fetch');
 const got = require('got');
 
 const details = async (videoId) => {
-  const link = `https://www.googleapis.com/youtube/v3/videos?part=id%2C+snippet&id=${videoId}&key=${process.env.API_KEY}`;
+  const url = `https://www.googleapis.com/youtube/v3/videos?part=id%2C+snippet&id=${videoId}&key=${process.env.API_KEY}`;
 
-  return await fetch(link, {
-    method: 'get',
-  })
-    .then((data) => data.json())
+  return await got(url)
+    .then((data) => JSON.parse(data.body))
     .then((data) => data.items[0].snippet)
     .then((data) => {
       const { title, description, channelTitle, categoryId } = data;
