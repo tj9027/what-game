@@ -1,5 +1,5 @@
 const got = require('got');
-const scraper = require('../scraper/scraper');
+const scraper = require('../utils/scraper');
 const puppeteer = require('puppeteer');
 
 const details = async (videoId) => {
