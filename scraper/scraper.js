@@ -1,11 +1,6 @@
 const cheerio = require('cheerio');
 
-const videos = new Set();
-
-const sleep = (seconds) =>
-  new Promise((resolve) => setTimeout(resolve, (seconds || 1) * 1000));
-
-async function scraper(browser, url) {
+async function scraper(browser, url, type) {
   const page = await browser.newPage();
   await page.setViewport({ width: 1280, height: 800 });
   await page.goto(url);
@@ -17,22 +12,44 @@ async function scraper(browser, url) {
   }
 
   const results = {};
-
-  await page.waitForSelector('div#contents', {
-    timeout: 10000,
-  });
+  if (type === 'youtube') {
+    await page.waitForSelector('div#contents', {
+      timeout: 10000,
+    });
+  } else if (type === 'twitch') {
+    await page.waitForSelector('div.channel-header', {
+      timeout: 10000,
+    });
+  }
   let html = await page.content();
-  results['__frontPage__'] = parse(html);
+  results.details = parse(html, type);
 
   return results;
 }
 
-function parse(html) {
+function parse(html, type) {
   const $ = cheerio.load(html);
-  const gameDiv = $('a.yt-simple-endpoint', 'div#contents');
-  return {
-    gameTitle: $('div#title', 'div#text-container').html(),
-    gameLink: $('a', 'div#contents').attr('href'),
-  };
+  if (type === 'youtube') {
+    return {
+      gameTitle: $('div#title', 'div#text-container').html(),
+      gameLink: 'https://www.youtube.com' + $('a', 'div#contents').attr('href'),
+    };
+  } else if (type === 'twitch') {
+    return {
+      status:
+        $(
+          '.tw-channel-status-text-indicator',
+          // '.channel-header-user-tab__user-content',
+          'div.channel-header'
+        ).text() === 'Live'
+          ? 'online'
+          : 'offline',
+      game: $(
+        'img',
+        // 'a.tw-interactive',
+        '.channel-info-bar__info-container'
+      ).attr('alt'),
+    };
+  }
 }
 module.exports = scraper;

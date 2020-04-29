@@ -22,10 +22,11 @@ const details = async (videoId) => {
       if (+obj.categoryId === 20) {
         await (async () => {
           const browser = await puppeteer.launch();
-          const game = await scraper(browser, videoUrl);
-          obj.game = game.__frontPage__;
+          const game = await scraper(browser, videoUrl, 'youtube');
+          obj.game = game.details;
           await browser.close();
         })();
+        console.log('success ☘️', obj);
         return obj;
       }
     })
@@ -34,17 +35,34 @@ const details = async (videoId) => {
 
 const streamer = async (id) => {
   const url = 'https://api.twitch.tv/kraken/users?id=' + id;
-  const headers = {
-    'Client-ID': process.env.CLIENT_ID,
-    Accept: 'application / vnd.twitchtv.v5 + json',
-  };
 
-  const options = {
-    url,
-    headers,
-  };
-  return await got(options)
+  return await got(url, {
+    headers: {
+      'Client-ID': process.env.CLIENT_ID,
+      Accept: 'application / vnd.twitchtv.v5 + json',
+    },
+  })
     .then((res) => JSON.parse(res.body))
-    .then((data) => data.users[0].display_name);
+    //get name here
+    .then((data) => {
+      console.log(data);
+      return data.users[0].display_name;
+    })
+    //scraper here
+    .then(async (name) => {
+      let status;
+      await (async () => {
+        const browser = await puppeteer.launch();
+        status = await scraper(
+          browser,
+          `https://www.twitch.tv/${name}`,
+          'twitch'
+        );
+        await browser.close();
+      })();
+      status.name = name;
+      return status;
+      // return name;
+    });
 };
 module.exports = { details, streamer };
