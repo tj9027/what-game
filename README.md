@@ -125,6 +125,8 @@ During this project, I learned:
 - Normalize the response data in a better way.
 - Modify the functions so that it can accept an array of IDs and output an array of objects for each ID.
 - Better selectors for the scraper function
+- Merge the 2 endpoints and manage the id type internally
+- Create cli-tool
 
 ## My Directory 🌳
 
