@@ -127,6 +127,7 @@ During this project, I learned:
 - Better selectors for the scraper function
 - Merge the 2 endpoints and manage the id type internally
 - Create cli-tool
+- When querying for twitch, puppeteer can be avoided 
 
 ## My Directory 🌳
 
